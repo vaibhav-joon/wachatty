@@ -1,88 +1,29 @@
-# n8n-nodes-waghl
+# WAGHL interactive form update
 
-An n8n community node for sending WhatsApp messages through the [WAGHL API](https://waghl.com/).
+This patch changes **only** `nodes/Waghl/Waghl.node.ts` interactive form fields and the normalization functions in `nodes/Waghl/interactive.ts`. It uses the existing `waghlApi` credential and `{baseUrl}/send-interactive` endpoint unchanged. It is intended for the already-installed interactive add-on, **not** the initial repo ZIP.
 
-This package is not affiliated with n8n. WAGHL is a third-party WhatsApp service for GoHighLevel.
+## Apply safely in the same Codespace
 
-## Features
-
-- Send text messages
-- Send images, videos, audio, and WhatsApp voice notes
-- Send documents with an optional caption
-- Use n8n expressions in every message field
-- Process one request per incoming item and preserve item pairing
-
-## Installation
-
-### Self-hosted n8n
-
-1. In n8n, go to **Settings** > **Community nodes**.
-2. Select **Install** and enter `n8n-nodes-waghl`.
-3. Confirm installation, then add **WAGHL** to a workflow.
-
-### n8n Cloud
-
-After n8n verifies this package, workspace owners can find it in the node panel and install it from the community section. Until then, unverified packages can only be installed on self-hosted n8n.
-
-## Credentials
-
-Create a **WAGHL API** credential and provide:
-
-- **API Key**: The API key issued by WAGHL.
-- **Base URL**: The HTTPS base URL issued for your WAGHL API. Do not include `/send-message`, `/send-media`, or `/send-document`, and do not add a trailing slash.
-
-The node sends the API key in the request body as `api_key`, as required by the current WAGHL endpoint contract used by this integration. Do not put keys in workflow fields or commit them to source control.
-
-## Operations
-
-| Operation | Endpoint | Required fields |
-| --- | --- | --- |
-| Send Text Message | `POST /send-message` | Sender, Recipient, Message |
-| Send Media | `POST /send-media` | Sender, Recipient, Media Type, Media URL |
-| Send Document | `POST /send-document` | Sender, Recipient, Document URL |
-
-Media supports `image`, `video`, and `audio`; audio can be sent as a voice note. Captions are optional for media and documents.
-
-## Example workflow
-
-Import [examples/send-text-message.json](examples/send-text-message.json), choose your WAGHL credential, and replace the sample phone numbers before executing it. For data-driven workflows, fields accept normal n8n expressions, for example:
-
-```text
-Recipient: {{$json.phone}}
-Message: Hello {{$json.firstName}}, thanks for contacting us!
-```
-
-## Development
-
-Use Node.js 22 or newer.
+1. Upload `waghl-interactive-ui-patch.zip` to `/workspaces/waghl`.
+2. Run:
 
 ```bash
-npm install
-npm test
-npm run dev
+cd /workspaces/waghl
+unzip -o waghl-interactive-ui-patch.zip
+node apply-ui-update.mjs
+npm run lint:fix
+npm test && npm pack --dry-run
 ```
 
-`npm test` runs the n8n linter and production build. Test every operation against a non-production WAGHL account before release; this repository deliberately contains no API keys or real recipient numbers.
+The patch creates timestamped `.bak` copies of the two original TypeScript files and the unit-test file, which Git will not include unless you add them explicitly. Do not run `git add .`.
 
-## Release and verification
+## Form changes
 
-The GitHub Actions workflows validate every change and publish releases with npm provenance. From May 1, 2026, n8n requires a provenance-attested GitHub Actions publish for community-node verification.
+- Buttons: one selector and only the relevant additional field per button type, with 1–3 buttons enforced.
+- Lists: native Add Section / Add Item controls, title/optional description/ID per item.
+- Carousels: native Add Card / Add Button controls, 2–10 cards and up to two buttons per card; optional image URL in the editor.
+- Existing credentials, HTTP helper, endpoint and response validation remain untouched.
 
-Before creating the first GitHub release:
+**n8n UI limitation:** nested fixedCollection controls and field visibility may vary by n8n version. Inspect the actual dev editor before publishing. If nested fields don't render correctly, use a flat builder or JSON fallback instead of shipping a broken UI.
 
-1. Confirm that this repository is public at `https://github.com/vaibhav-joon/waghl` and that the package metadata points to that exact URL. If the repository moves, update `repository`, `bugs`, and this URL together before publishing.
-2. Ensure the unscoped npm package name `n8n-nodes-waghl` is available to the WAGHL npm owner. If it is unavailable, rename the package to `@waghl/n8n-nodes-waghl` and keep the `n8n-nodes-` prefix after the scope.
-3. Push the `main` branch, enable GitHub Actions, and configure npm Trusted Publishing for this repository and the `npm` GitHub environment. Do not publish from a local computer.
-4. Create a GitHub Release with tag `v1.0.0`. The publish workflow will run validation and publish with `--provenance`.
-5. Confirm the npm package contains only the expected `dist` files, README, and license. Run `npx @n8n/scan-community-package n8n-nodes-waghl` after publication.
-6. Submit the published package in the n8n Creator Portal for verification, providing the npm package URL, public GitHub repository, documentation, and this example workflow.
-
-## Security and support
-
-This node makes outbound HTTPS requests only to the Base URL saved in the selected credential. It does not read environment variables or local files, and it has no runtime npm dependencies.
-
-For WAGHL API access and product support, visit [WAGHL Help](https://waghl.com/help/).
-
-## License
-
-[MIT](LICENSE.md)
+**API caution:** while the form allows empty card image URLs as requested, your current backend notes say images are effectively required for a proper card. Verify image-free carousel cards on the backend before relying on them.

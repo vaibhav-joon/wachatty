@@ -78,49 +78,39 @@ export function parseJsonArray(value: unknown, name: string): unknown[] {
   return parsed;
 }
 
-function normalizeButtons(raw: unknown, name: string, required: boolean): JsonMap[] {
-  // n8n fixedCollection returns { button: [...] } in the configured field.
+function normalizeButtons(raw: unknown, name: string, required: boolean, max = 3): JsonMap[] {
   const values = isObject(raw) && Array.isArray(raw.button) ? raw.button : raw;
-  if (values == null && !required) return [];
+  if ((values == null || (isObject(values) && Object.keys(values).length === 0)) && !required) return [];
   const buttons = parseJsonArray(values, name);
-  if (required && buttons.length === 0) {
-    throw new Error(`${name} must contain at least one button`);
-  }
-  if (buttons.length > 3) {
-    throw new Error(`${name} allows at most 3 buttons`);
-  }
-
-  return buttons.map((rawButton, index) => {
+  if (required && buttons.length === 0) throw new Error(`${name} requires at least one button`);
+  if (buttons.length > max) throw new Error(`${name} allows at most ${max} buttons`);
+  return buttons.map((entry, index) => {
     const path = `${name}[${index}]`;
-    if (!isObject(rawButton)) throw new Error(`${path} must be an object`);
-    const type = requiredText(rawButton.type, `${path}.type`);
-    const displayText = requiredText(rawButton.displayText, `${path}.displayText`);
+    if (!isObject(entry)) throw new Error(`${path} must be an object`);
+    const type = requiredText(entry.type, `${path}.type`);
+    const displayText = requiredText(entry.displayText, `${path}.displayText`);
     const button: JsonMap = { type, displayText };
     switch (type) {
       case 'quick_reply':
-        button.id = requiredText(rawButton.id, `${path}.id`);
+        button.id = requiredText(entry.id, `${path}.id`);
         break;
       case 'url':
-        button.url = requireWebUrl(rawButton.url, `${path}.url`);
+        button.url = requireWebUrl(entry.url, `${path}.url`);
         break;
       case 'call': {
-        const phone = requiredText(rawButton.phoneNumber, `${path}.phoneNumber`);
-        if (!/^\+[0-9]+$/.test(phone)) {
-          throw new Error(`${path}.phoneNumber must start with + and contain only digits`);
-        }
+        const phone = requiredText(entry.callNumber ?? entry.phoneNumber, `${path}.phoneNumber`);
+        if (!/^\+[0-9]+$/.test(phone)) throw new Error(`${path}.phoneNumber must begin with + and contain digits`);
         button.phoneNumber = phone;
         break;
       }
       case 'wa_call': {
-        const phone = requiredText(rawButton.phoneNumber, `${path}.phoneNumber`);
-        if (!/^[0-9]+$/.test(phone)) {
-          throw new Error(`${path}.phoneNumber must contain digits only`);
-        }
+        const phone = requiredText(entry.whatsappNumber ?? entry.phoneNumber, `${path}.phoneNumber`);
+        if (!/^[0-9]+$/.test(phone)) throw new Error(`${path}.phoneNumber must contain digits only`);
         button.phoneNumber = phone;
         break;
       }
       case 'copy':
-        button.copy_code = requiredText(rawButton.copy_code, `${path}.copy_code`);
+        button.copy_code = requiredText(entry.copy_code, `${path}.copy_code`);
         break;
       default:
         throw new Error(`${path}.type must be quick_reply, url, call, wa_call or copy`);
@@ -130,47 +120,53 @@ function normalizeButtons(raw: unknown, name: string, required: boolean): JsonMa
 }
 
 function normalizeSections(raw: unknown): JsonMap[] {
-  const sections = parseJsonArray(raw, 'List sections');
+  const unwrapped = isObject(raw) && Array.isArray(raw.section) ? raw.section : raw;
+  const sections = parseJsonArray(unwrapped, 'List sections');
   if (sections.length === 0) throw new Error('List sections must contain at least one section');
-  return sections.map((rawSection, sectionIndex) => {
-    const path = `list[${sectionIndex}]`;
-    if (!isObject(rawSection)) throw new Error(`${path} must be an object`);
-    if (!Array.isArray(rawSection.rows) || rawSection.rows.length === 0) {
-      throw new Error(`${path}.rows must contain at least one row`);
+  return sections.map((entry, index) => {
+    const path = `list[${index}]`;
+    if (!isObject(entry)) throw new Error(`${path} must be an object`);
+    const nested = entry.items;
+    const rowsValue = entry.rows ?? (isObject(nested) ? nested.item : undefined);
+    if (!Array.isArray(rowsValue) || rowsValue.length === 0) {
+      throw new Error(`${path}.rows must contain at least one item`);
     }
-    const section: JsonMap = {
-      rows: rawSection.rows.map((rawRow, rowIndex) => {
-        const rowPath = `${path}.rows[${rowIndex}]`;
-        if (!isObject(rawRow)) throw new Error(`${rowPath} must be an object`);
-        const row: JsonMap = {
-          rowId: requiredText(rawRow.rowId, `${rowPath}.rowId`),
-          title: requiredText(rawRow.title, `${rowPath}.title`),
-        };
-        const description = optionalText(rawRow.description);
-        if (description) row.description = description;
-        return row;
-      }),
-    };
-    const title = optionalText(rawSection.title);
+    const rows = rowsValue.map((item, itemIndex) => {
+      const rowPath = `${path}.rows[${itemIndex}]`;
+      if (!isObject(item)) throw new Error(`${rowPath} must be an object`);
+      const row: JsonMap = {
+        rowId: requiredText(item.rowId, `${rowPath}.rowId`),
+        title: requiredText(item.title, `${rowPath}.title`),
+      };
+      const description = optionalText(item.description);
+      if (description) row.description = description;
+      return row;
+    });
+    const section: JsonMap = { rows };
+    const title = optionalText(entry.title);
     if (title) section.title = title;
     return section;
   });
 }
 
 function normalizeCards(raw: unknown): JsonMap[] {
-  const cards = parseJsonArray(raw, 'Carousel cards');
-  if (cards.length === 0) throw new Error('Carousel cards must contain at least one card');
-  return cards.map((rawCard, index) => {
+  const unwrapped = isObject(raw) && Array.isArray(raw.card) ? raw.card : raw;
+  const cards = parseJsonArray(unwrapped, 'Carousel cards');
+  if (cards.length < 2 || cards.length > 10) {
+    throw new Error('Carousel cards require between 2 and 10 cards');
+  }
+  return cards.map((entry, index) => {
     const path = `cards[${index}]`;
-    if (!isObject(rawCard)) throw new Error(`${path} must be an object`);
-    const card: JsonMap = {
-      body: requiredText(rawCard.body, `${path}.body`),
-      image: requireWebUrl(rawCard.image, `${path}.image`),
-    };
-    const title = optionalText(rawCard.title);
+    if (!isObject(entry)) throw new Error(`${path} must be an object`);
+    const card: JsonMap = { body: requiredText(entry.body, `${path}.body`) };
+    const image = optionalText(entry.image);
+    if (image) card.image = requireWebUrl(image, `${path}.image`);
+    const title = optionalText(entry.title);
     if (title) card.title = title;
-    if (rawCard.buttons !== undefined) {
-      card.buttons = normalizeButtons(rawCard.buttons, `${path}.buttons`, false);
+    const nestedButtons = entry.buttons;
+    if (nestedButtons !== undefined) {
+      const normalized = normalizeButtons(nestedButtons, `${path}.buttons`, false, 2);
+      if (normalized.length) card.buttons = normalized;
     }
     return card;
   });

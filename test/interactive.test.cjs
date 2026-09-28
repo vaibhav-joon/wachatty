@@ -84,13 +84,65 @@ test('carousel: cards with quick-reply and link CTA', () => {
   assert.equal(body.cards[1].buttons[0].type, 'url');
 });
 
-test('invalid recipient and missing carousel image rejected', () => {
+test('recipient syntax is validated and carousel image is optional', () => {
   assert.throws(() => buildInteractivePayload('list', { ...common, number: '+13473087143' }, {
     sections: [{ rows: [{ rowId: 'a', title: 'A' }] }],
   }), /digits only/i);
+  const payload = buildInteractivePayload('carousel', common, {
+    cards: [{ body: 'Without image' }, { body: 'With image', image: 'https://example.com/pic.jpg' }],
+  });
+  assert.equal(payload.cards.length, 2);
+  assert.equal(payload.cards[0].image, undefined);
+});
+
+test('n8n native Sections/Items fields become the backend list array', () => {
+  const body = buildInteractivePayload('list', common, {
+    sections: { section: [
+      { title: 'Monthly', items: { item: [
+        { title: 'Basic', rowId: 'basic', description: 'Starter' },
+        { title: 'Pro', rowId: 'pro' },
+      ] } },
+    ] },
+  });
+  assert.deepEqual(body.list, [{
+    title: 'Monthly', rows: [
+      { rowId: 'basic', title: 'Basic', description: 'Starter' },
+      { rowId: 'pro', title: 'Pro' },
+    ],
+  }]);
+});
+
+test('n8n native Cards/Buttons fields serialize correctly', () => {
+  const body = buildInteractivePayload('carousel', common, {
+    cards: { card: [
+      { body: 'Basic plan', buttons: { button: [
+        { type: 'quick_reply', displayText: 'Choose Basic', id: 'basic' },
+      ] } },
+      { body: 'Pro plan', image: 'https://example.com/pro.jpg', buttons: { button: [
+        { type: 'url', displayText: 'Details', url: 'https://waghl.com' },
+      ] } },
+    ] },
+  });
+  assert.equal(body.cards[0].buttons[0].id, 'basic');
+  assert.equal(body.cards[1].image, 'https://example.com/pro.jpg');
+});
+
+test('distinct UI phone fields map to backend phoneNumber', () => {
+  const body = buildInteractivePayload('button', common, { buttons: { button: [
+    { type: 'call', displayText: 'Call', callNumber: '+97450001234' },
+    { type: 'wa_call', displayText: 'WhatsApp', whatsappNumber: '97450001234' },
+  ] } });
+  assert.equal(body.button[0].phoneNumber, '+97450001234');
+  assert.equal(body.button[1].phoneNumber, '97450001234');
+});
+
+test('carousel enforces two through ten cards and two buttons per card', () => {
+  assert.throws(() => buildInteractivePayload('carousel', common, { cards: [{ body: 'Only one' }] }), /between 2 and 10/);
   assert.throws(() => buildInteractivePayload('carousel', common, {
-    cards: [{ body: 'Missing image' }],
-  }), /image is required/i);
+    cards: [{ body: 'First', buttons: Array.from({ length: 3 }, (_, i) => ({
+      type: 'quick_reply', displayText: `Select ${i}`, id: String(i),
+    })) }, { body: 'Second' }],
+  }), /at most 2/);
 });
 
 test('interactive responses: no silent success on missing or empty wa_msg_id', () => {
