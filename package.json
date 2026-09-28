@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "description": "n8n community node for sending WhatsApp messages through the WAGHL API",
   "license": "MIT",
-  "keywords": ["n8n-community-node-package", "n8n", "waghl", "whatsapp"],
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "waghl",
+    "whatsapp"
+  ],
   "author": {
     "name": "WAGHL",
     "email": "info@waghl.com",
@@ -22,17 +27,24 @@
     "dev": "n8n-node dev",
     "lint": "n8n-node lint",
     "lint:fix": "n8n-node lint --fix",
-    "test": "npm run lint && npm run build",
+    "test": "npm run lint && npm run build && node --test test/interactive.test.cjs",
     "test:package": "npx @n8n/scan-community-package n8n-nodes-waghl",
     "release": "n8n-node release",
-    "prepublishOnly": "n8n-node prerelease"
+    "prepublishOnly": "n8n-node prerelease",
+    "test:interactive": "npm run build && node --test test/interactive.test.cjs"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "n8n": {
     "n8nNodesApiVersion": 1,
     "strict": true,
-    "credentials": ["dist/credentials/WaghlApi.credentials.js"],
-    "nodes": ["dist/nodes/Waghl/Waghl.node.js"]
+    "credentials": [
+      "dist/credentials/WaghlApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Waghl/Waghl.node.js"
+    ]
   },
   "devDependencies": {
     "@n8n/node-cli": "*",
