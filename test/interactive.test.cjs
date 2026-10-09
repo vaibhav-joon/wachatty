@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const {
   buildInteractivePayload,
   interactiveResponseFailure,
-} = require('../dist/nodes/Waghl/interactive.js');
+} = require('../dist/nodes/WaChatty/interactive.js');
 
 const common = {
   sender: '9117888936041608',
@@ -15,12 +15,12 @@ const common = {
 test('buttons: quick reply, URL, phone call; no API key in node params', () => {
   const body = buildInteractivePayload('button', common, {
     title: 'Callback request',
-    footer: 'WAGHL',
+    footer: 'WaChatty',
     headerUrl: 'https://example.com/photo.jpg',
     mediaType: 'image',
     buttons: { button: [
       { type: 'quick_reply', displayText: 'Yes please', id: 'cb_yes' },
-      { type: 'url', displayText: 'Visit site', url: 'https://waghl.com' },
+      { type: 'url', displayText: 'Visit site', url: 'https://wachatty.com' },
       { type: 'call', displayText: 'Call us', phoneNumber: '+97450001234' },
     ] },
   });
@@ -75,7 +75,7 @@ test('carousel: cards with quick-reply and link CTA', () => {
       { title: 'Basic', body: 'Starter', image: 'https://example.com/basic.jpg',
         buttons: [{ type: 'quick_reply', displayText: 'Choose', id: 'basic' }] },
       { title: 'Pro', body: 'Premium', image: 'https://example.com/pro.jpg',
-        buttons: [{ type: 'url', displayText: 'Details', url: 'https://waghl.com/pro' }] },
+        buttons: [{ type: 'url', displayText: 'Details', url: 'https://wachatty.com/pro' }] },
     ],
   });
   assert.equal(body.type, 'carousel');
@@ -119,7 +119,7 @@ test('n8n native Cards/Buttons fields serialize correctly', () => {
         { type: 'quick_reply', displayText: 'Choose Basic', id: 'basic' },
       ] } },
       { body: 'Pro plan', image: 'https://example.com/pro.jpg', buttons: { button: [
-        { type: 'url', displayText: 'Details', url: 'https://waghl.com' },
+        { type: 'url', displayText: 'Details', url: 'https://wachatty.com' },
       ] } },
     ] },
   });

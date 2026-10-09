@@ -1,6 +1,11 @@
-# WAGHL interactive form update
+# WaChatty interactive form update
 
-This patch changes **only** `nodes/Waghl/Waghl.node.ts` interactive form fields and the normalization functions in `nodes/Waghl/interactive.ts`. It uses the existing `waghlApi` credential and `{baseUrl}/send-interactive` endpoint unchanged. It is intended for the already-installed interactive add-on, **not** the initial repo ZIP.
+This patch changes **only** `nodes/WaChatty/WaChatty.node.ts` interactive form fields and the normalization functions in `nodes/WaChatty/interactive.ts`. It uses the existing `waChattyApi` credential and `{baseUrl}/send-interactive` endpoint unchanged. It is intended for the already-installed interactive add-on, **not** the initial repo ZIP.
+
+
+## Get WaChatty
+
+To purchase WaChatty, create an account, or obtain API access, visit [wachatty.com](https://wachatty.com). For product and account questions, contact [info@wachatty.com](mailto:info@wachatty.com).
 
 ## Apply safely in the same Codespace
 

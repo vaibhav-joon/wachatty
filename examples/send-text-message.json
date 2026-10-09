@@ -1,5 +1,5 @@
 {
-  "name": "Send a WAGHL text message",
+  "name": "Send a WaChatty text message",
   "nodes": [
     {
       "parameters": {},
@@ -14,17 +14,17 @@
         "operation": "sendText",
         "sender": "+919876543210",
         "number": "+14155552671",
-        "message": "Hello from n8n and WAGHL"
+        "message": "Hello from n8n and WaChatty"
       },
       "id": "ceb80799-1d34-4a5d-8c91-a5361ab56a7e",
-      "name": "WAGHL",
-      "type": "n8n-nodes-waghl.waghl",
+      "name": "WaChatty",
+      "type": "n8n-nodes-wachatty.waChatty",
       "typeVersion": 1,
       "position": [480, 300],
       "credentials": {
-        "waghlApi": {
+        "waChattyApi": {
           "id": "REPLACE_WITH_CREDENTIAL_ID",
-          "name": "WAGHL API"
+          "name": "WaChatty API"
         }
       }
     }
@@ -32,7 +32,7 @@
   "pinData": {},
   "connections": {
     "Manual Trigger": {
-      "main": [[{"node": "WAGHL", "type": "main", "index": 0}]]
+      "main": [[{"node": "WaChatty", "type": "main", "index": 0}]]
     }
   },
   "active": false,

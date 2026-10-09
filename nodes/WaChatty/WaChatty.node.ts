@@ -15,24 +15,24 @@ import {
 
 import { buildInteractivePayload, interactiveResponseFailure } from './interactive';
 
-export class Waghl implements INodeType {
+export class WaChatty implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'WAGHL',
-    name: 'waghl',
-    icon: 'file:../../icons/waghl.svg',
+    displayName: 'WaChatty',
+    name: 'waChatty',
+    icon: { light: 'file:../../icons/wachatty.svg', dark: 'file:../../icons/wachatty-dark.svg' },
     group: ['output'],
     version: 1,
     subtitle: '={{$parameter["operation"]}}',
-    description: 'Send WhatsApp messages through the WAGHL API',
+    description: 'Send WhatsApp messages through the WaChatty API',
     defaults: {
-      name: 'WAGHL',
+      name: 'WaChatty',
     },
     usableAsTool: true,
     inputs: [NodeConnectionTypes.Main],
     outputs: [NodeConnectionTypes.Main],
     credentials: [
       {
-        name: 'waghlApi',
+        name: 'waChattyApi',
         required: true,
       },
     ],
@@ -91,7 +91,7 @@ export class Waghl implements INodeType {
         default: '',
         required: true,
         placeholder: '+919876543210',
-        description: 'WhatsApp sender number connected to WAGHL',
+        description: 'WhatsApp sender number connected to WaChatty',
       },
       {
         displayName: 'Recipient',
@@ -181,7 +181,7 @@ export class Waghl implements INodeType {
           show: { operation: ['sendDocument'] },
         },
       },
-      // Interactive messages: all use the same WAGHL credential and Base URL
+      // Interactive messages: all use the same WaChatty credential and Base URL
       {
         displayName: 'Message',
         name: 'interactiveMessage',
@@ -336,15 +336,15 @@ export class Waghl implements INodeType {
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
     const items = this.getInputData();
     const returnData: INodeExecutionData[] = [];
-    const credentials = await this.getCredentials('waghlApi');
+    const credentials = await this.getCredentials('waChattyApi');
 
 const baseUrl = String(credentials.baseUrl ?? '').trim().replace(/\/+$/, '');
 
 if (!baseUrl) {
-  throw new NodeOperationError(this.getNode(), 'WAGHL Base URL is missing');
+  throw new NodeOperationError(this.getNode(), 'WaChatty Base URL is missing');
 }
     if (!baseUrl) {
-      throw new NodeOperationError(this.getNode(), 'WAGHL Base URL is missing');
+      throw new NodeOperationError(this.getNode(), 'WaChatty Base URL is missing');
     }
 
     for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
@@ -458,7 +458,7 @@ if (!baseUrl) {
 
         const response = await this.helpers.httpRequestWithAuthentication.call(
   this,
-  'waghlApi',
+  'waChattyApi',
   {
     method: 'POST',
     url: `${baseUrl}${endpoint}`,
@@ -495,7 +495,7 @@ if (!baseUrl) {
         if (this.continueOnFail()) {
           returnData.push({
             json: {
-              error: error instanceof Error ? error.message : 'Unknown WAGHL API error',
+              error: error instanceof Error ? error.message : 'Unknown WaChatty API error',
             },
             pairedItem: { item: itemIndex },
           });

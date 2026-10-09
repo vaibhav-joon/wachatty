@@ -1,26 +1,26 @@
 {
-  "name": "n8n-nodes-waghl",
-  "version": "1.0.0",
-  "description": "n8n community node for sending WhatsApp messages through the WAGHL API",
+  "name": "n8n-nodes-wachatty",
+  "version": "1.0.1",
+  "description": "n8n community node for sending WhatsApp messages through the WaChatty API",
   "license": "MIT",
   "keywords": [
     "n8n-community-node-package",
     "n8n",
-    "waghl",
-    "whatsapp"
+    "whatsapp",
+    "wachatty"
   ],
   "author": {
-    "name": "WAGHL",
-    "email": "info@waghl.com",
-    "url": "https://waghl.com"
+    "name": "WaChatty",
+    "email": "info@wachatty.com",
+    "url": "https://wachatty.com"
   },
-  "homepage": "https://waghl.com",
+  "homepage": "https://wachatty.com",
   "bugs": {
-    "url": "https://github.com/vaibhav-joon/waghl/issues"
+    "url": "https://github.com/vaibhav-joon/wachatty/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vaibhav-joon/waghl.git"
+    "url": "git+https://github.com/vaibhav-joon/wachatty.git"
   },
   "scripts": {
     "build": "n8n-node build",
@@ -28,7 +28,7 @@
     "lint": "n8n-node lint",
     "lint:fix": "n8n-node lint --fix",
     "test": "npm run lint && npm run build && node --test test/interactive.test.cjs",
-    "test:package": "npx @n8n/scan-community-package n8n-nodes-waghl",
+    "test:package": "npx @n8n/scan-community-package n8n-nodes-wachatty",
     "release": "n8n-node release",
     "prepublishOnly": "n8n-node prerelease",
     "test:interactive": "npm run build && node --test test/interactive.test.cjs"
@@ -40,10 +40,10 @@
     "n8nNodesApiVersion": 1,
     "strict": true,
     "credentials": [
-      "dist/credentials/WaghlApi.credentials.js"
+      "dist/credentials/WaChattyApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Waghl/Waghl.node.js"
+      "dist/nodes/WaChatty/WaChatty.node.js"
     ]
   },
   "devDependencies": {

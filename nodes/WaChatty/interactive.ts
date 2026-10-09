@@ -1,6 +1,6 @@
 /**
- * WAGHL interactive message request builders.
- * Authentication is deliberately NOT included here: the waghlApi credential
+ * WaChatty interactive message request builders.
+ * Authentication is deliberately NOT included here: the waChattyApi credential
  * injects api_key via n8n's httpRequestWithAuthentication helper.
  */
 
@@ -212,18 +212,18 @@ export function buildInteractivePayload(
   } else {
     throw new Error(`Unsupported interactive type: ${String(kind)}`);
   }
-  // api_key is injected by n8n's waghlApi credential, never stored in node params.
+  // api_key is injected by n8n's waChattyApi credential, never stored in node params.
   return payload;
 }
 
-/** WAGHL may return HTTP 200/status:true even when its Node sender rejected a payload. */
+/** WaChatty may return HTTP 200/status:true even when its Node sender rejected a payload. */
 export function interactiveResponseFailure(response: unknown): string | null {
-  if (!isObject(response)) return 'Unexpected WAGHL interactive API response';
+  if (!isObject(response)) return 'Unexpected WaChatty interactive API response';
   if (response.status === false) {
     const error = optionalText(response.error) || optionalText(response.msg);
-    return error || 'WAGHL interactive API returned status: false';
+    return error || 'WaChatty interactive API returned status: false';
   }
-  if (response.status !== true) return 'WAGHL interactive API did not confirm success';
+  if (response.status !== true) return 'WaChatty interactive API did not confirm success';
   const messageId = response.wa_msg_id;
   const hasMessageId =
     (typeof messageId === 'string' && messageId.trim().length > 0) ||
@@ -232,5 +232,5 @@ export function interactiveResponseFailure(response: unknown): string | null {
     (isObject(messageId) && Object.keys(messageId).length > 0);
   return hasMessageId
     ? null
-    : 'WAGHL reported success but returned an empty wa_msg_id; the message may have been rejected';
+    : 'WaChatty reported success but returned an empty wa_msg_id; the message may have been rejected';
 }

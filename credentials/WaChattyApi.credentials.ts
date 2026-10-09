@@ -6,14 +6,21 @@ import type {
   Icon,
 } from 'n8n-workflow';
 
-export class WaghlApi implements ICredentialType {
-  name = 'waghlApi';
-  displayName = 'WAGHL API';
-  documentationUrl = 'https://waghl.com';
+export class WaChattyApi implements ICredentialType {
+  name = 'waChattyApi';
+  displayName = 'WaChatty API';
+  documentationUrl = 'https://wachatty.com';
 
-  icon: Icon = 'file:../icons/waghl.svg';
+  icon: Icon = { light: 'file:../icons/wachatty.svg', dark: 'file:../icons/wachatty-dark.svg' };
 
   properties: INodeProperties[] = [
+    {
+      displayName:
+        'New to WaChatty? <a href="https://wachatty.com" target="_blank">View plans and get started</a>',
+      name: 'wachattyPurchaseNotice',
+      type: 'notice',
+      default: '',
+    },
     {
       displayName: 'API Key',
       name: 'apiKey',
@@ -21,7 +28,7 @@ export class WaghlApi implements ICredentialType {
       typeOptions: { password: true },
       default: '',
       required: true,
-      description: 'Your WAGHL API key',
+      description: 'Your WaChatty API key',
     },
     {
       displayName: 'Base URL',
@@ -29,7 +36,7 @@ export class WaghlApi implements ICredentialType {
       type: 'string',
       default: 'https://custom2.waghl.com',
       required: true,
-      description: 'WAGHL API base URL',
+      description: 'WaChatty API base URL',
     },
   ];
 

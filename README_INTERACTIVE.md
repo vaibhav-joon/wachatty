@@ -1,10 +1,10 @@
-# WAGHL n8n: interactive messaging extension
+# WaChatty n8n: interactive messaging extension
 
 This is an **add-on for your CURRENT GitHub repository**, not a replacement repository.
-It adds three native WhatsApp operations to `nodes/Waghl/Waghl.node.ts` and keeps all
+It adds three native WhatsApp operations to `nodes/WaChatty/WaChatty.node.ts` and keeps all
 existing text/media/document operations, credentials and npm package naming intact.
 
-It was prepared from your API contract and an earlier WAGHL repository snapshot.
+It was prepared from your API contract and an earlier WaChatty repository snapshot.
 The latest GitHub branch was not accessible to this environment. For safety the patch
 script checks each insertion point, fails without modifying the node if its layout
 has changed, and refuses to patch a node still using manual API-key HTTP requests.
@@ -12,7 +12,7 @@ has changed, and refuses to patch a node still using manual API-key HTTP request
 ## Install into your existing Codespace
 
 1. Download `waghl-interactive-addon.zip` from this conversation.
-2. Open `https://github.com/vaibhav-joon/waghl` → Code → Codespaces → your Codespace.
+2. Open `https://github.com/vaibhav-joon/wachatty` → Code → Codespaces → your Codespace.
 3. Upload the ZIP to the root of your checkout (`/workspaces/waghl`).
 4. In the Codespace terminal:
 
@@ -26,27 +26,27 @@ has changed, and refuses to patch a node still using manual API-key HTTP request
    npm pack --dry-run
    ```
 
-5. Before testing against production users, open `nodes/Waghl/Waghl.node.ts`
+5. Before testing against production users, open `nodes/WaChatty/WaChatty.node.ts`
    and inspect the generated fields. The new operations are:
    - Send Interactive Buttons
    - Send Interactive List
    - Send Interactive Carousel
 6. Run `npm run dev` in your Codespace. Open port 5678 privately through the Ports
-   panel. Create a Manual Trigger → WAGHL workflow. Use only your own test number.
+   panel. Create a Manual Trigger → WaChatty workflow. Use only your own test number.
 7. If tests and end-to-end sends succeed, commit the node/helper/tests/package and
    updated lockfile. Bump the npm version before publishing; never reuse a published
    version number.
 
 The script does **not** rename your npm package: if you have changed the package
 name to `n8n-nodes-whatsapp-connector`, it stays that way. It also leaves your
-GitHub Actions workflows and existing WAGHL credential test untouched.
+GitHub Actions workflows and existing WaChatty credential test untouched.
 
 ## Configuration
 
-- WAGHL API Key: use the existing n8n **WAGHL API** credential. Never enter keys
+- WaChatty API Key: use the existing n8n **WaChatty API** credential. Never enter keys
   in node fields or examples. The existing n8n credential injects `api_key`.
 - Interactive endpoint: the node uses the same **Base URL** stored in the existing
-  WAGHL API credential as every other operation, and sends interactive requests to
+  WaChatty API credential as every other operation, and sends interactive requests to
   `{{baseUrl}}/send-interactive`. There is no separate interactive URL field.
 - Sender: **device ID**, for example `9117888936041608`, not a phone number.
 - Recipient: digits only; multiple recipients are separated using `|`.
@@ -93,7 +93,7 @@ under your existing Laravel contract. n8n expressions work in these fields.
     "title": "Pro",
     "body": "Full feature set",
     "image": "https://www.w3schools.com/html/pic_trulli.jpg",
-    "buttons": [{ "type": "url", "displayText": "See details", "url": "https://waghl.com/pro" }]
+    "buttons": [{ "type": "url", "displayText": "See details", "url": "https://wachatty.com/pro" }]
   }
 ]
 ```
@@ -132,4 +132,4 @@ for live sends.
 
 The script makes **no changes** to the original node in that case. Your current
 repo has diverged from the older snapshot. Share your latest
-`nodes/Waghl/Waghl.node.ts` and I'll provide an exact adjusted patch.
+`nodes/WaChatty/WaChatty.node.ts` and I'll provide an exact adjusted patch.
